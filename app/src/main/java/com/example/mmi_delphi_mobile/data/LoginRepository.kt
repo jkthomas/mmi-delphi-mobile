@@ -1,6 +1,7 @@
 package com.example.mmi_delphi_mobile.data
 
 import com.example.mmi_delphi_mobile.data.model.LoggedInUser
+import com.example.mmi_delphi_mobile.service.account.AccountService
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -28,12 +29,14 @@ class LoginRepository(val dataSource: LoginDataSource) {
     }
 
     fun login(username: String, password: String): Result<LoggedInUser> {
-        // handle login
+        // TODO: Implement full login/signin
         val result = dataSource.login(username, password)
 
         if (result is Result.Success) {
             setLoggedInUser(result.data)
         }
+        val accountService = AccountService()
+        accountService.loginAccount(username, password)
 
         return result
     }

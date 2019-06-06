@@ -1,10 +1,16 @@
 package com.example.mmi_delphi_mobile.ui.login
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.StrictMode
 import android.support.annotation.StringRes
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +31,10 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
+
+        checkPermissions()
+        // TODO: Temporary
+        configureNetworkThreadPolicy()
 
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
@@ -95,6 +105,58 @@ class LoginActivity : AppCompatActivity() {
                 loginViewModel.login(username.text.toString(), password.text.toString())
             }
         }
+    }
+
+    private fun checkPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            //permission is not granted - request permisions
+            setInternetPermissions()
+        }
+
+        //permission granted already - check connection
+        if (isOnline()) {
+            return
+        } else {
+            shutdownApplication("No connection with server", "Connection with serwer couldn't be established. Application will shut down.")
+        }
+    }
+
+    private fun setInternetPermissions() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.INTERNET), 1)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            shutdownApplication("Permissions not provided", "Permission not granted. Shutting down...")
+        }
+    }
+
+    private fun shutdownApplication(shutdownAlertTitle: String, shutdownAlertMessage: String) {
+        val shutdownAlertBuilder = AlertDialog.Builder(this)
+        shutdownAlertBuilder.setTitle(shutdownAlertTitle)
+        shutdownAlertBuilder.setMessage(shutdownAlertMessage)
+        shutdownAlertBuilder.setPositiveButton("Shutdown") { _, _ ->
+            finish()
+        }
+        val shutdownDialog: AlertDialog = shutdownAlertBuilder.create()
+        shutdownDialog.show()
+    }
+
+    private fun isOnline(): Boolean {
+        val runtime = Runtime.getRuntime()
+        try {
+            val ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8")
+            val exitValue = ipProcess.waitFor()
+            return exitValue == 0
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+
+        return false
+    }
+
+    private fun configureNetworkThreadPolicy() {
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
