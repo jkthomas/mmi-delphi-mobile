@@ -22,6 +22,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 
 import com.example.mmi_delphi_mobile.R
+import java.net.ConnectException
 
 class LoginActivity : AppCompatActivity() {
 
@@ -39,6 +40,7 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
         val login = findViewById<Button>(R.id.login)
+        val register = findViewById<Button>(R.id.register)
         val loading = findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
@@ -48,7 +50,8 @@ class LoginActivity : AppCompatActivity() {
             val loginState = it ?: return@Observer
 
             // disable login button unless both username / password is valid
-            login.isEnabled = loginState.isDataValid
+//            login.isEnabled = loginState.isDataValid
+//            register.isEnabled = loginState.isDataValid
 
             if (loginState.usernameError != null) {
                 username.error = getString(loginState.usernameError)
@@ -102,7 +105,34 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+                try{
+                    val wasLoginSuccessful = loginViewModel.login(username.text.toString(), password.text.toString())
+                    if(wasLoginSuccessful){
+                        Toast.makeText(this@LoginActivity, "Logged in successfully!!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Login was NOT successful. Please try again with proper credentials!", Toast.LENGTH_LONG).show()
+                    }
+                    loading.visibility = View.INVISIBLE
+                } catch (e: ConnectException) {
+                    Toast.makeText(this@LoginActivity, "Unable to communicate with server", Toast.LENGTH_LONG).show()
+                    loading.visibility = View.INVISIBLE
+                }
+            }
+
+            register.setOnClickListener {
+                loading.visibility = View.VISIBLE
+                try{
+                    val wasRegisterSuccessful = loginViewModel.register(username.text.toString(), password.text.toString())
+                    if(wasRegisterSuccessful){
+                        Toast.makeText(this@LoginActivity, "Registered successfully. Now you can log in!", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Register was NOT successful. Please try again with different credentials!", Toast.LENGTH_LONG).show()
+                    }
+                    loading.visibility = View.INVISIBLE
+                } catch (e: ConnectException) {
+                    Toast.makeText(this@LoginActivity, "Unable to communicate with server", Toast.LENGTH_LONG).show()
+                    loading.visibility = View.INVISIBLE
+                }
             }
         }
     }

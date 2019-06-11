@@ -1,7 +1,10 @@
 package com.example.mmi_delphi_mobile.data
 
+import android.widget.Toast
 import com.example.mmi_delphi_mobile.data.model.LoggedInUser
 import com.example.mmi_delphi_mobile.service.account.AccountService
+import java.lang.Exception
+import java.net.ConnectException
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -9,6 +12,8 @@ import com.example.mmi_delphi_mobile.service.account.AccountService
  */
 
 class LoginRepository(val dataSource: LoginDataSource) {
+
+    private val accountService = AccountService()
 
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null
@@ -28,15 +33,20 @@ class LoginRepository(val dataSource: LoginDataSource) {
         dataSource.logout()
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    fun login(username: String, password: String): Boolean {
         // TODO: Implement full login/signin
-        val result = dataSource.login(username, password)
+//        val result = dataSource.login(username, password)
+//
+//        if (result is Result.Success) {
+//            setLoggedInUser(result.data)
+//        }
+        val result = accountService.loginAccount(username, password)
 
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
-        val accountService = AccountService()
-        accountService.loginAccount(username, password)
+        return result
+    }
+
+    fun register(username: String, password: String): Boolean {
+        val result = accountService.createAccount(username, password)
 
         return result
     }
