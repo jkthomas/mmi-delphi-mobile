@@ -10,4 +10,7 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >4 characters</string>
     <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_feed">FeedActivity</string>
+    <string name="tab_poll">Poll</string>
+    <string name="tab_account">Account</string>
 </resources>

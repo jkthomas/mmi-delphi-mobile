@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.StrictMode
@@ -22,6 +23,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 
 import com.example.mmi_delphi_mobile.R
+import com.example.mmi_delphi_mobile.ui.feed.FeedActivity
 import java.net.ConnectException
 
 class LoginActivity : AppCompatActivity() {
@@ -63,6 +65,9 @@ class LoginActivity : AppCompatActivity() {
                     val wasLoginSuccessful = loginViewModel.login(username.text.toString(), password.text.toString())
                     if(wasLoginSuccessful){
                         Toast.makeText(this@LoginActivity, "Logged in successfully!!", Toast.LENGTH_LONG).show()
+
+                        val intent = Intent(this@LoginActivity, FeedActivity::class.java)
+                        startActivity(intent)
                     } else {
                         Toast.makeText(this@LoginActivity, "Login was NOT successful. Please try again with proper credentials!", Toast.LENGTH_LONG).show()
                     }
