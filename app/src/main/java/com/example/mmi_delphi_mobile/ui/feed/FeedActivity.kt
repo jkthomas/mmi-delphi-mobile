@@ -13,7 +13,14 @@ import com.example.mmi_delphi_mobile.R
 
 class FeedActivity : AppCompatActivity() {
 
-    private var userLoggedOut: Boolean = false
+    private var userLoggedOut: Boolean
+        get() = false
+        set(value) {
+            if (value) {
+                JsonWebTokenStore.setJsonWebToken("")
+                this.finish()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,16 +31,11 @@ class FeedActivity : AppCompatActivity() {
         viewPager.adapter = sectionsPagerAdapter
         val tabs: TabLayout = findViewById(R.id.tabs)
         tabs.setupWithViewPager(viewPager)
-        val fab: FloatingActionButton = findViewById(R.id.fab)
+        val logoutButton: FloatingActionButton = findViewById(R.id.fab)
 
-        fab.setOnClickListener {
-            // TODO: Logout is delayed, fix needed
+        logoutButton.setOnClickListener {
             val logoutDialog = createLogoutDialog()
             logoutDialog.show()
-            if (this.userLoggedOut) {
-                JsonWebTokenStore.setJsonWebToken("")
-                this.finish()
-            }
         }
     }
 
@@ -49,11 +51,11 @@ class FeedActivity : AppCompatActivity() {
         DialogInterface.OnClickListener { dialog, which ->
             when (which) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    userLoggedOut = true
+                    this.userLoggedOut = true
                 }
 
                 DialogInterface.BUTTON_NEGATIVE -> {
-                    userLoggedOut = false
+                    this.userLoggedOut = false
                 }
             }
         }
