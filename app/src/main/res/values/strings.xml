@@ -13,4 +13,6 @@
     <string name="title_activity_feed">FeedActivity</string>
     <string name="tab_poll">Poll</string>
     <string name="tab_account">Account</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
