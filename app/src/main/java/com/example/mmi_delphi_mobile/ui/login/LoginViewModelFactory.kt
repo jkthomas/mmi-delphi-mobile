@@ -2,7 +2,6 @@ package com.example.mmi_delphi_mobile.ui.login
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import com.example.mmi_delphi_mobile.data.LoginDataSource
 import com.example.mmi_delphi_mobile.data.LoginRepository
 
 /**
@@ -15,9 +14,7 @@ class LoginViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
             return LoginViewModel(
-                loginRepository = LoginRepository(
-                    dataSource = LoginDataSource()
-                )
+                loginRepository = LoginRepository()
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
