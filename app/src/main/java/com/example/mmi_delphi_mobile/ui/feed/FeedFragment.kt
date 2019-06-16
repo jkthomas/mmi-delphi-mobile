@@ -6,9 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.support.v4.app.Fragment
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
+import android.widget.RadioButton
 import com.example.mmi_delphi_mobile.R
+import com.example.mmi_delphi_mobile.utilities.enums.ViewElementType
+import org.json.JSONArray
+import org.json.JSONObject
 
 /**
  * A placeholder fragment containing a simple view.
@@ -19,7 +24,7 @@ class FeedFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        feedViewModel = ViewModelProviders.of(this).get(FeedViewModel::class.java).apply {
+        feedViewModel = ViewModelProviders.of(this, FeedViewModelFactory()).get(FeedViewModel::class.java).apply {
             setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
         }
     }
@@ -28,12 +33,88 @@ class FeedFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_feed, container, false)
-        val textView: TextView = root.findViewById(R.id.contentTextView)
-        feedViewModel.text.observe(this, Observer<String> {
-            textView.text = it
-        })
-        return root
+        return inflater.inflate(R.layout.fragment_feed, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val constraintLayout = view.findViewById(R.id.constraintLayout) as ConstraintLayout
+
+        var viewElementIndex = 101
+
+        val pollData: JSONObject = feedViewModel.getPollData()
+        val questionsArray: JSONArray = pollData.getJSONArray("questions")
+
+        for(index in 0..(questionsArray.length() - 1)){
+            val question = questionsArray.getJSONObject(index)
+            this.placeViewElement(ViewElementType.TEXT_VIEW, viewElementIndex, constraintLayout, question.getString("content"))
+            viewElementIndex += 1
+
+            val answersArray = question.getJSONArray("answers")
+            for(index in 0..(answersArray.length() - 1)) {
+                val answer = answersArray.getJSONObject(index)
+                this.placeViewElement(ViewElementType.RADIO_BUTTON, viewElementIndex, constraintLayout, answer.getString(index.toString()))
+                viewElementIndex += 1
+            }
+        }
+    }
+
+    private fun placeViewElement(viewElementType: ViewElementType, viewElementIndex: Int, constraintLayout: ConstraintLayout, content: String){
+        val viewElement: View
+        if(viewElementType == ViewElementType.TEXT_VIEW){
+            viewElement = TextView(activity)
+            viewElement.text = content
+        } else { //ViewElementType.RADIO_BUTTON) case
+            viewElement = RadioButton(activity)
+            viewElement.text = content
+        }
+        viewElement.id = viewElementIndex
+        viewElement.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT)
+        constraintLayout.addView(viewElement)
+        //Setting position
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(constraintLayout)
+
+        if((viewElementIndex - 1) == 100) {
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.TOP
+            )
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.LEFT
+            )
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.RIGHT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.RIGHT
+            )
+        } else {
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.TOP,
+                (viewElementIndex - 1),
+                ConstraintSet.BOTTOM
+            )
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.LEFT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.LEFT
+            )
+            constraintSet.connect(
+                viewElement.id,
+                ConstraintSet.RIGHT,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.RIGHT
+            )
+        }
+
+        constraintSet.applyTo(constraintLayout)
     }
 
     companion object {

@@ -1,8 +1,7 @@
 package com.example.mmi_delphi_mobile.data
 
 /**
- * A generic class that holds a value with its loading status.
- * @param <T>
+    Loading status class
  */
 sealed class Result<out T : Any> {
 

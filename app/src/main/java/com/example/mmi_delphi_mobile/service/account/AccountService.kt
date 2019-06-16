@@ -13,9 +13,7 @@ class AccountService {
 
     fun createAccount(username: String, password: String): Boolean {
         val response: Response = post("http://10.0.3.2:4200/account/signup", data = mapOf("username" to username, "password" to password))
-        val responseJson: JSONObject = response.jsonObject
-
-        return response.statusCode == 200
+        return response.statusCode == 200 //If statusCode == 200 -> User created account successfully
     }
 
     fun loginAccount(username: String, password: String): Boolean {
@@ -23,18 +21,17 @@ class AccountService {
         val responseJson: JSONObject = response.jsonObject
         return if(response.statusCode == 200) {
             JsonWebTokenStore.setJsonWebToken(responseJson["token"].toString())
-            true;
+            true
         } else {
-            false;
+            false
         }
-        // TODO: Implement saving
     }
 
     fun updateAccount(username: String, password: String, newPassword: String){
+        // TODO: Implement
         val response: Response = put("http://10.0.3.2:4200/account/update",
             headers = mapOf("x-access-token" to JsonWebTokenStore.getJsonWebToken()),
             data = mapOf("username" to username, "password" to password, "new_password" to newPassword))
         val responseJson: JSONObject = response.jsonObject
-        // TODO: Provide feedback
     }
 }

@@ -42,7 +42,7 @@ class FeedActivity : AppCompatActivity() {
     private fun createLogoutDialog(): AlertDialog.Builder {
         return AlertDialog.Builder(this)
             .setTitle("Log out")
-            .setMessage("Do you really want to log out?")
+            .setMessage("Are you sure you want to log out?")
             .setPositiveButton(R.string.yes, dialogClickListener)
             .setNegativeButton(R.string.no, dialogClickListener)
     }
