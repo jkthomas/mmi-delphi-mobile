@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.arch.lifecycle.ViewModelProviders
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
+import android.util.Half.toFloat
 import android.widget.RadioButton
 import com.example.mmi_delphi_mobile.R
 import com.example.mmi_delphi_mobile.utilities.enums.ViewElementType
@@ -60,9 +61,12 @@ class FeedFragment : Fragment() {
 
     private fun placeViewElement(viewElementType: ViewElementType, viewElementIndex: Int, constraintLayout: ConstraintLayout, content: String){
         val viewElement: View
+        var margin: Int = 0
         if(viewElementType == ViewElementType.TEXT_VIEW){
             viewElement = TextView(activity)
             viewElement.text = content
+            viewElement.textSize = 20f
+            margin = 40
         } else { //ViewElementType.RADIO_BUTTON) case
             viewElement = RadioButton(activity)
             viewElement.text = content
@@ -98,7 +102,8 @@ class FeedFragment : Fragment() {
                 viewElement.id,
                 ConstraintSet.TOP,
                 (viewElementIndex - 1),
-                ConstraintSet.BOTTOM
+                ConstraintSet.BOTTOM,
+                margin
             )
             constraintSet.connect(
                 viewElement.id,
@@ -106,12 +111,14 @@ class FeedFragment : Fragment() {
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.LEFT
             )
-            constraintSet.connect(
-                viewElement.id,
-                ConstraintSet.RIGHT,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.RIGHT
-            )
+            if(viewElementType == ViewElementType.TEXT_VIEW) {
+                constraintSet.connect(
+                    viewElement.id,
+                    ConstraintSet.RIGHT,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.RIGHT
+                )
+            }
         }
 
         constraintSet.applyTo(constraintLayout)
